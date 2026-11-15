@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Student Achievement Dashboard</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--text:#1b2733;--muted:#5d6b7a;--line:#dde3ea;--accent:#0b5cad;--accent-t:#fff;--soft:#eaf1f9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161d;--card:#18212b;--text:#e8edf2;--muted:#9fb0c0;--line:#2b3744;--accent:#5aa6ee;--accent-t:#0b1520;--soft:#1e2b3a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10161d;--card:#18212b;--text:#e8edf2;--muted:#9fb0c0;--line:#2b3744;--accent:#5aa6ee;--accent-t:#0b1520;--soft:#1e2b3a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 24px 56px}
+header{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;margin-bottom:20px;padding:22px 26px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h1{font-size:1.75rem;line-height:1.25;letter-spacing:-.01em;margin:0 0 6px}h2{font-size:1.05rem;font-weight:650;margin:0 0 14px}
+.sub{color:var(--muted);max-width:760px;margin:0;line-height:1.6}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-t);border:0;border-radius:8px;padding:9px 16px;font:600 14px inherit;cursor:pointer}
+.btn.alt{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+input[type=file]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.banner{border-radius:8px;padding:10px 14px;margin-bottom:16px;font-weight:600}
+.ok{background:#e3f4ec;color:#0b6b43}.err{background:#fde8e4;color:#a12d16}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ok{background:#12372a;color:#8be0b8}:root:not([data-theme="light"]) .err{background:#3d1c16;color:#ffb4a5}}
+.empty{text-align:center;padding:48px 16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:20px}
+.card.kpi{display:flex;flex-direction:column-reverse;gap:6px;padding:18px 20px;border-top:3px solid var(--accent)}.kpi:nth-child(2){border-top-color:#009E73}.kpi:nth-child(3){border-top-color:#D55E00}.kpi b{display:block;font-size:1.9rem;font-weight:700;line-height:1.1}.kpi span{color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;align-items:end;margin-bottom:20px}.filters::before{content:"Filters";grid-column:1/-1;font-size:1.05rem;font-weight:650;margin-bottom:-2px}
+label.f{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:4px}
+select,input[type=search]{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;min-width:0;width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;margin-bottom:20px}
+.chart{width:100%;color:var(--muted);font-size:12px}
+.note{color:var(--muted);font-size:.8rem;margin:6px 0 0}
+.ins{list-style:none;margin:0;padding:0;display:grid;gap:12px}.ins li{padding:12px 16px;background:var(--soft);border-left:3px solid var(--accent);border-radius:8px;line-height:1.6}
+.tw{overflow:auto;max-height:540px;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;font-size:.86rem}tbody tr:nth-child(even){background:var(--soft)}tbody tr:hover{background:var(--line)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--soft);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;box-shadow:0 1px 0 var(--line)}
+.pg{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap}.pg .btn{padding:6px 14px}
+.tag{display:inline-block;padding:2px 10px;border-radius:10px;color:#fff;font-weight:600;font-size:.75rem}
+.btn:hover{filter:brightness(1.08)}.btn.alt:hover{background:var(--soft);filter:none}.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{line-height:1.5}.empty h2{margin-bottom:8px}
+.errpanel{margin-bottom:20px;border-left:5px solid #D55E00}.errpanel h2{color:#D55E00}.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}.chip{padding:2px 10px;border-radius:999px;background:var(--soft);border:1px solid var(--line);font-size:.8rem}.chip.bad{border-color:#D55E00;color:#D55E00;font-weight:600}.errpanel details{margin:6px 0}.errpanel summary{cursor:pointer;color:var(--accent)}
+@media (max-width:600px){.wrap{padding:14px 12px 36px}header{padding:16px}h1{font-size:1.35rem}.card{padding:16px}.kpis{gap:10px}.kpi b{font-size:1.5rem}.filters{grid-template-columns:1fr 1fr}.filters::before{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-is@18.3.1/umd/react-is.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js"></script>
+<script>
+const {useState,useMemo,useEffect,useDeferredValue}=React,h=React.createElement;
+const {ResponsiveContainer,BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,Legend,PieChart,Pie,Cell,LineChart,Line}=Recharts;
+const CLS={L:'Low',M:'Middle',H:'High'},COL={L:'#D55E00',M:'#56B4E9',H:'#009E73'};
+const NATS={KW:'Kuwait',KuwaIT:'Kuwait',lebanon:'Lebanon',Tunis:'Tunisia',Lybia:'Libya',venzuela:'Venezuela',SaudiArabia:'Saudi Arabia'};
+const MAPS={gender:{M:'Male',F:'Female'},stage:{lowerlevel:'Lower',MiddleSchool:'Middle',HighSchool:'High'},sem:{F:'First',S:'Second'},rel:{Mum:'Mother',Father:'Father'},abs:{'Under-7':'Under 7 days','Above-7':'Over 7 days'}};
+const SRC={gender:'gender',nat:'NationalITy',stage:'StageID',grade:'GradeID',topic:'Topic',sem:'Semester',rel:'Relation',survey:'ParentAnsweringSurvey',sat:'ParentschoolSatisfaction',abs:'StudentAbsenceDays'};
+const NUM={raised:'raisedhands',visited:'VisITedResources',ann:'AnnouncementsView',disc:'Discussion'};
+const REQ=['gender','NationalITy','StageID','Topic','Semester','Relation','raisedhands','VisITedResources','AnnouncementsView','Discussion','ParentAnsweringSurvey','ParentschoolSatisfaction','StudentAbsenceDays','Class'];
+const FILT=[['gender','Gender'],['nat','Nationality'],['stage','Stage'],['topic','Topic'],['sem','Semester'],['abs','Absence days'],['rel','Responsible parent']];
+const DIMS=[['abs','Absence days'],['survey','Parent answered survey'],['sat','Parent satisfaction'],['gender','Gender'],['rel','Responsible parent'],['nat','Nationality'],['stage','Stage'],['topic','Topic'],['sem','Semester']];
+const MIN=10;
+
+const ALIAS={'gender':'gender','nationality':'NationalITy','stage':'StageID','grade':'GradeID','topic':'Topic','semester':'Semester','responsible parent':'Relation','raised hands':'raisedhands','resources visited':'VisITedResources','announcements viewed':'AnnouncementsView','discussion':'Discussion','absence days':'StudentAbsenceDays','parent survey':'ParentAnsweringSurvey','parent satisfaction':'ParentschoolSatisfaction','performance level':'Class'};
+const CLSIN={Low:'L',Middle:'M',High:'H'};
+function parseCSV(t){const rows=[];let r=[],f='',q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;
+  else if(c===','){r.push(f);f=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);f='';if(r.length>1||r[0]!=='')rows.push(r);r=[]}
+  else f+=c}
+ if(f!==''||r.length){r.push(f);rows.push(r)}return rows}
+
+function build(text){
+ const t=parseCSV(text.replace(/^\uFEFF/,''));
+ if(t.length<2)throw new Error(t.length?'The file has a header row but no student rows.':'The file is empty.');
+ const head=t[0].map(s=>{s=s.trim();return ALIAS[s.toLowerCase()]||s}),miss=REQ.filter(c=>!head.includes(c));
+ if(head.length===1&&/[;\t|]/.test(head[0]))throw new Error('This file doesn’t look comma-separated. Please save it as a standard comma-separated CSV and try again.');
+ if(miss.length){const low={};head.forEach(c=>{low[c.toLowerCase().replace(/[^a-z0-9]/g,'')]=c});const hints={};miss.forEach(m=>{const x=low[m.toLowerCase().replace(/[^a-z0-9]/g,'')];if(x)hints[m]=x});const e=new Error('Your file is missing columns the dashboard needs, so no charts were drawn. Check the column names in the header row.');e.missing=miss;e.found=head;e.hints=hints;throw e}
+ const ix={};head.forEach((c,i)=>ix[c]=i);
+ const g=(r,c)=>ix[c]===undefined?'':(r[ix[c]]||'').trim();
+ const rows=[];
+ t.slice(1).forEach(r=>{const c0=g(r,'Class'),cls=CLSIN[c0]||c0;if(!CLS[cls])return;
+  const o={id:rows.length+1,cls};
+  for(const k in SRC){const v=g(r,SRC[k]);o[k]=(k==='nat'?NATS[v]:MAPS[k]&&MAPS[k][v])||v}
+  for(const k in NUM)o[k]=Number(g(r,NUM[k]))||0;
+  o.eng=(o.raised+o.visited+o.ann+o.disc)/4;rows.push(o)});
+ if(!rows.length)throw new Error('None of the rows have a valid Class value. The Class column must contain L, M or H (or Low, Middle, High).');
+ return{rows,cols:head.length,total:t.length-1}}
+
+const COLS=[['gender','Gender'],['nat','Nationality'],['stage','Stage'],['grade','Grade'],['topic','Topic'],['sem','Semester'],['rel','Responsible parent'],['raised','Raised hands'],['visited','Resources visited'],['ann','Announcements viewed'],['disc','Discussion'],['abs','Absence days'],['survey','Parent survey'],['sat','Parent satisfaction']];
+const NUMK=['raised','visited','ann','disc'];
+const share=(a,fn)=>a.length?100*a.filter(fn).length/a.length:0;
+const avg=(a,fn)=>a.length?a.reduce((s,r)=>s+fn(r),0)/a.length:0;
+const P=x=>Math.round(x)+'%';
+
+function insights(d){
+ const o=[],sh=(a,c)=>share(a,r=>r.cls===c);
+ const hi=d.filter(r=>r.abs==='Over 7 days'),lo=d.filter(r=>r.abs==='Under 7 days');
+ if(hi.length>=MIN&&lo.length>=MIN)o.push(['Attendance is the strongest signal. ','Students absent over 7 days are '+P(sh(hi,'L'))+' low and '+P(sh(hi,'H'))+' high performers; with under 7 days absent it is '+P(sh(lo,'L'))+' low and '+P(sh(lo,'H'))+' high.']);
+ const eL=d.filter(r=>r.cls==='L'),eH=d.filter(r=>r.cls==='H');
+ if(eL.length>=5&&eH.length>=5)o.push(['Engagement rises with achievement. ','The average engagement score is '+avg(eL,r=>r.eng).toFixed(0)+' for low performers versus '+avg(eH,r=>r.eng).toFixed(0)+' for high performers (0–100 scale).']);
+ const y=d.filter(r=>r.survey==='Yes'),n=d.filter(r=>r.survey==='No');
+ if(y.length>=MIN&&n.length>=MIN)o.push(['Family involvement lines up with results. ','Where the parent answered the survey, '+P(sh(y,'H'))+' of students are high performers, versus '+P(sh(n,'H'))+' where they did not.']);
+ const f=d.filter(r=>r.gender==='Female'),m=d.filter(r=>r.gender==='Male');
+ if(f.length>=MIN&&m.length>=MIN)o.push(['Gender gaps overlap with attendance. ','High-performer share is '+P(sh(f,'H'))+' for girls and '+P(sh(m,'H'))+' for boys, but boys are also absent more often ('+P(share(m,r=>r.abs==='Over 7 days'))+' versus '+P(share(f,r=>r.abs==='Over 7 days'))+' over 7 days), so the effects cannot be separated here.']);
+ o.push(['Read with care. ','These are associations, not causes, and small groups (under '+MIN+' students) are hidden. The data comes from one learning-management system and is not US data.']);
+ return o}
+
+function computeStats(d){
+ const c={L:0,M:0,H:0},s={L:[0,0,0,0],M:[0,0,0,0],H:[0,0,0,0]};let hi=0,sv=0,eng=0;
+ d.forEach(r=>{c[r.cls]++;const a=s[r.cls];a[0]+=r.raised;a[1]+=r.visited;a[2]+=r.ann;a[3]+=r.disc;if(r.abs==='Over 7 days')hi++;if(r.survey==='Yes')sv++;eng+=r.eng});
+ const n=d.length||1,pc=x=>P(100*x/n);
+ return{mix:['L','M','H'].map(k=>({key:k,name:CLS[k],value:c[k]})),
+  prof:['L','M','H'].map(k=>{const m=c[k]||1,a=s[k];return{name:CLS[k],'Raised hands':a[0]/m,'Resources visited':a[1]/m,'Announcements viewed':a[2]/m,'Discussion':a[3]/m}}),
+  kp:[['Students',d.length.toLocaleString()],['High performers',pc(c.H)],['Low performers',pc(c.L)],['Over 7 days absent',pc(hi)],['Parent survey response',pc(sv)],['Avg engagement (0–100)',(eng/n).toFixed(0)]],
+  ins:insights(d)}}
+
+function ErrorPanel({s,pick,onDismiss}){
+ const m=s.missing,chip=(c,k,t)=>h('span',{className:'chip '+(k||''),key:c},t||c);
+ return h('div',{className:'card errpanel',role:'alert'},
+  h('h2',null,'We couldn’t load that file'),h('p',{style:{margin:'0 0 10px'}},s.msg),
+  m?h(React.Fragment,null,h('p',{style:{margin:0}},h('b',null,'Missing '+m.length+' of '+REQ.length+' required columns:')),
+   h('div',{className:'chips'},m.map(c=>chip(c,'bad',c+(s.hints&&s.hints[c]?' (your file has “'+s.hints[c]+'”; names are case-sensitive)':'')))),
+   h('details',null,h('summary',null,'Columns found in your file ('+s.found.length+')'),h('div',{className:'chips'},s.found.map(c=>chip(c)))),
+   h('details',null,h('summary',null,'All required columns'),h('div',{className:'chips'},REQ.map(c=>chip(c))))):null,
+  h('p',{className:'note'},'Tip: upload the original xAPI-Edu-Data.csv (comma-separated, with a header row). If you saved from Excel, choose “CSV UTF-8”.'),
+  h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},pick,h('button',{className:'btn alt',onClick:onDismiss},'Dismiss')))}
+
+function Chart({height,children}){return h('div',{className:'chart',style:{height}},h(ResponsiveContainer,{width:'100%',height:'100%'},children))}
+const tick={fill:'currentColor',fontSize:12},tipStyle={contentStyle:{background:'var(--card)',border:'1px solid var(--line)',borderRadius:8,color:'var(--text)'}};
+
+function App(){
+ const [ds,setDs]=useState(null),[status,setStatus]=useState(null);
+ const [f,setF]=useState({}),[dim,setDim]=useState('abs'),[q,setQ]=useState(''),[qc,setQc]=useState('all'),[page,setPage]=useState(0),[dl,setDl]=useState(null),[xm,setXm]=useState('');
+ useEffect(()=>{let ok=true;if(window.claude&&window.claude.use)window.claude.use('downloads').then(d=>{if(ok)setDl(d||null)}).catch(()=>{});return()=>{ok=false}},[]);
+ const rows=ds?ds.rows:[];
+ const onFile=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;
+  try{const r=build(await file.text());setDs(r);setF({});setQ('');setPage(0);
+   setStatus({ok:true,msg:'Loaded '+r.rows.length.toLocaleString()+' rows and '+r.cols+' columns from '+file.name+(r.total>r.rows.length?' ('+(r.total-r.rows.length)+' rows skipped)':'')})}
+  catch(err){setStatus({ok:false,msg:err.message||'Something went wrong while reading the file.',missing:err.missing,found:err.found,hints:err.hints})}};
+ const opts=useMemo(()=>{const o={};FILT.forEach(([k])=>o[k]=[...new Set(rows.map(r=>r[k]))].sort());return o},[rows]);
+ const data=useMemo(()=>rows.filter(r=>FILT.every(([k])=>!f[k]||f[k]==='All'||r[k]===f[k])),[rows,f]);
+ const {mix,prof,kp,ins}=useMemo(()=>computeStats(data),[data]);
+ const bd=useMemo(()=>{const m={};data.forEach(r=>{const v=m[r[dim]]=m[r[dim]]||{L:0,M:0,H:0,n:0};v[r.cls]++;v.n++});
+  const all=Object.entries(m),a=all.filter(([,v])=>v.n>=MIN).map(([k,v])=>({name:k+' (n='+v.n+')',L:100*v.L/v.n,M:100*v.M/v.n,H:100*v.H/v.n})).sort((x,y)=>y.H-x.H);
+  return{a,hidden:all.length-a.length}},[data,dim]);
+ 
+ const idx=useMemo(()=>rows.map(r=>{const m={cls:CLS[r.cls].toLowerCase()};COLS.forEach(([k])=>{m[k]=String(r[k]).toLowerCase()});return m}),[rows]);const dq=useDeferredValue(q);const tbl=useMemo(()=>{const s=dq.trim().toLowerCase();if(!s)return data;const ks=qc==='all'?['cls',...COLS.map(c=>c[0])]:[qc];const v=(r,k)=>idx[r.id-1][k];return data.filter(r=>ks.some(k=>NUMK.includes(k)?v(r,k)===s:v(r,k).includes(s)))},[data,dq,qc,idx]);
+ const PS=15,pages=Math.max(1,Math.ceil(tbl.length/PS)),pg=Math.min(page,pages-1);
+ const doExport=async()=>{try{const esc=v=>{const s=String(v);return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};const lines=[['Performance level',...COLS.map(c=>c[1])].map(esc).join(',')];tbl.forEach(r=>lines.push([CLS[r.cls],...COLS.map(([k])=>r[k])].map(esc).join(',')));await dl.save({filename:'filtered-students.csv',data:'\uFEFF'+lines.join('\r\n')});setXm('Export ready: '+tbl.length.toLocaleString()+' rows (current filters and search).')}catch(e){setXm(e&&e.code==='declined'?'Export cancelled.':'Export isn’t available right now. Please try again, or open the dashboard on claude.ai.')}};
+
+ const upload=(cls,label)=>h('label',{className:'btn '+cls},label,h('input',{type:'file',accept:'.csv,text/csv',onChange:onFile}));
+ const head=h('header',null,
+  h('div',null,h('h1',null,'Student Achievement Dashboard'),
+   h('p',{className:'sub'},'Explore which factors move together with student performance (Low, Middle, High): attendance, classroom engagement, family involvement and demographics. Upload the student CSV to begin.')),
+  ds?upload('alt','Replace CSV'):null);
+ const banner=!status?null:status.ok?h('div',{className:'banner ok',role:'status'},status.msg):h(ErrorPanel,{s:status,pick:upload('','Choose another file'),onDismiss:()=>setStatus(null)});
+ if(!ds)return h('div',{className:'wrap'},head,banner,
+  h('div',{className:'card empty'},h('h2',null,'Upload your dataset'),h('p',{className:'sub',style:{margin:'0 auto 16px'}},'Choose the CSV file (xAPI-Edu-Data.csv). Charts appear after it loads. Your file is processed in your browser and is not uploaded anywhere.'),upload('','Upload CSV')));
+
+ 
+ const cols=COLS;
+ 
+
+ return h('div',{className:'wrap'},head,banner,
+  h('div',{className:'kpis'},kp.map(([l,v])=>h('div',{className:'card kpi',key:l},h('b',null,v),h('span',null,l)))),
+  h('div',{className:'card filters'},
+   FILT.map(([k,l])=>h('label',{className:'f',key:k},l,h('select',{value:f[k]||'All',onChange:e=>{setF({...f,[k]:e.target.value});setPage(0)}},h('option',null,'All'),opts[k].map(v=>h('option',{key:v},v))))),
+   h('button',{className:'btn alt',onClick:()=>{setF({});setPage(0)}},'Reset filters')),
+  data.length===0?h('div',{className:'card empty'},'No students match these filters.'):h(React.Fragment,null,
+  h('div',{className:'grid'},
+   h('div',{className:'card'},h('h2',null,'Performance mix'),
+    h(Chart,{height:280},h(PieChart,null,h(Pie,{data:mix,dataKey:'value',nameKey:'name',innerRadius:55,outerRadius:95,label:p=>p.name+' '+Math.round(p.percent*100)+'%'},mix.map(m=>h(Cell,{key:m.key,fill:COL[m.key]}))),h(Tooltip,tipStyle)))),
+   h('div',{className:'card'},h('h2',null,'Engagement by performance level'),
+    h(Chart,{height:280},h(LineChart,{data:prof,margin:{left:0,right:12,top:8}},h(CartesianGrid,{stroke:'currentColor',strokeOpacity:.15}),h(XAxis,{dataKey:'name',tick}),h(YAxis,{tick,domain:[0,100]}),h(Tooltip,{...tipStyle,formatter:v=>v.toFixed(0)}),h(Legend,null),
+     [['Raised hands','#0072B2'],['Resources visited','#D55E00'],['Announcements viewed','#CC79A7'],['Discussion','#7f8c99']].map(([k,c])=>h(Line,{key:k,type:'monotone',dataKey:k,stroke:c,strokeWidth:2.5,dot:{r:4}})))),
+    h('p',{className:'note'},'Average count per student (0–100).')),
+   h('div',{className:'card',style:{gridColumn:'1 / -1'}},
+    h('div',{style:{display:'flex',justifyContent:'space-between',flexWrap:'wrap',gap:8,alignItems:'center'}},h('h2',{style:{margin:0}},'Performance mix by group'),
+     h('label',{className:'f',style:{flexDirection:'row',alignItems:'center'}},'Break down by',h('select',{value:dim,onChange:e=>setDim(e.target.value),style:{width:'auto'}},DIMS.map(([k,l])=>h('option',{key:k,value:k},l))))),
+    h(Chart,{height:Math.max(200,bd.a.length*40+80)},h(BarChart,{data:bd.a,layout:'vertical',margin:{left:8,right:16}},h(CartesianGrid,{stroke:'currentColor',strokeOpacity:.15}),h(XAxis,{type:'number',domain:[0,100],tick,tickFormatter:v=>v+'%'}),h(YAxis,{type:'category',dataKey:'name',width:160,tick}),h(Tooltip,{...tipStyle,formatter:v=>v.toFixed(0)+'%'}),h(Legend,null),
+     ['L','M','H'].map(c=>h(Bar,{key:c,dataKey:c,name:CLS[c],stackId:'a',fill:COL[c]})))),
+    h('p',{className:'note'},'Share of students in each performance level, sorted by high-performer share. Groups under '+MIN+' students are hidden'+(bd.hidden?' ('+bd.hidden+' hidden).':'.')))),
+  h('div',{className:'card',style:{marginBottom:20}},h('h2',null,'Key findings (for the current filters)'),h('ul',{className:'ins'},ins.map((x,i)=>h('li',{key:i},h('b',null,x[0]),x[1]))))),
+  h('div',{className:'card'},
+   h('div',{style:{display:'flex',justifyContent:'space-between',flexWrap:'wrap',gap:8,alignItems:'center',marginBottom:10}},h('h2',{style:{margin:0}},'Student records ('+tbl.length.toLocaleString()+')'),
+    h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}},h('select',{'aria-label':'Search in column',value:qc,onChange:e=>{setQc(e.target.value);setPage(0)},style:{width:'auto',maxWidth:230}},h('option',{value:'all'},'Search in: All columns'),[['cls','Level (Low/Middle/High)'],...COLS].map(([k,l])=>h('option',{key:k,value:k},'Search in: '+l))),h('input',{type:'search',placeholder:NUMK.includes(qc)?'Exact number, e.g. 16':'Type to search…','aria-label':'Search text',value:q,onChange:e=>{setQ(e.target.value);setPage(0)},style:{maxWidth:240}}),dl?h('button',{className:'btn alt',onClick:doExport,disabled:!tbl.length},'Export CSV ('+tbl.length.toLocaleString()+' rows)'):null)),
+   xm?h('p',{className:'note',role:'status',style:{margin:'0 0 10px'}},xm):null,h('div',{className:'tw'},h('table',null,h('thead',null,h('tr',null,h('th',null,'Level'),cols.map(([k,l])=>h('th',{key:k},l)))),
+    h('tbody',null,tbl.slice(pg*PS,pg*PS+PS).map(r=>h('tr',{key:r.id},h('td',null,h('span',{className:'tag',style:{background:COL[r.cls]}},CLS[r.cls])),cols.map(([k])=>h('td',{key:k},r[k]))))))),
+   h('div',{className:'pg'},h('span',{className:'note'},tbl.length?'Showing '+(pg*PS+1)+'–'+Math.min(tbl.length,pg*PS+PS)+' of '+tbl.length.toLocaleString():'No matching rows'),
+    h('span',null,h('button',{className:'btn alt',disabled:pg===0,onClick:()=>setPage(pg-1)},'Previous'),' ',h('button',{className:'btn alt',disabled:pg>=pages-1,onClick:()=>setPage(pg+1)},'Next')))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
